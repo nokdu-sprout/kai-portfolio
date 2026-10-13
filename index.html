@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kai takes photos</title>
+<meta name="description" content="Photography portfolio for Kai">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f6f4f0;
+    --text: #1c1b19;
+    --muted: #6f6b64;
+    --line: #dcd8d0;
+    --overlay: rgba(14, 13, 12, 0.96);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #121110;
+      --text: #ece9e3;
+      --muted: #9a958c;
+      --line: #2a2826;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 400 16px/1.6 Inter, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+  .wrap { max-width: 1400px; margin: 0 auto; padding: 0 24px; }
+
+  /* Header */
+  header {
+    position: sticky; top: 0; z-index: 10;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+  header .wrap {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 16px; padding-top: 20px; padding-bottom: 20px;
+  }
+  .name {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 26px; font-weight: 500; letter-spacing: 0.01em;
+    text-decoration: none;
+  }
+  nav { display: flex; gap: 24px; }
+  nav a {
+    text-decoration: none; font-size: 13px;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
+  }
+  nav a:hover { color: var(--text); }
+
+  /* Intro */
+  .intro { padding: 72px 0 48px; max-width: 640px; }
+  .intro h1 {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-weight: 400; font-size: clamp(34px, 6vw, 56px); line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  .intro p { color: var(--muted); font-size: 17px; }
+
+  /* Filters */
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+  .filters button {
+    font: inherit; font-size: 13px; letter-spacing: 0.06em;
+    background: none; color: var(--muted);
+    border: 1px solid var(--line); border-radius: 999px;
+    padding: 6px 16px; cursor: pointer;
+  }
+  .filters button.active, .filters button:hover {
+    color: var(--text); border-color: var(--text);
+  }
+
+  /* Gallery (masonry) */
+  .gallery { columns: 3 320px; column-gap: 16px; padding-bottom: 80px; }
+  .gallery figure {
+    break-inside: avoid; margin-bottom: 16px; cursor: zoom-in;
+    overflow: hidden; background: var(--line);
+  }
+  .gallery img {
+    display: block; width: 100%; height: auto;
+    transition: transform 0.6s ease, opacity 0.4s ease; opacity: 0;
+  }
+  .gallery img.loaded { opacity: 1; }
+  .gallery figure:hover img { transform: scale(1.02); }
+
+  /* Sections */
+  section.block { border-top: 1px solid var(--line); padding: 72px 0; }
+  .block h2 {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-weight: 400; font-size: 36px; margin-bottom: 20px;
+  }
+  .about-grid {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+    gap: 48px; align-items: start;
+  }
+  .about-grid img { width: 100%; height: auto; display: block; }
+  .about-grid p { margin-bottom: 16px; max-width: 60ch; }
+  .contact-links { display: flex; flex-wrap: wrap; gap: 12px 32px; margin-top: 8px; }
+  .contact-links a {
+    text-decoration: none; border-bottom: 1px solid var(--line); padding-bottom: 2px;
+  }
+  .contact-links a:hover { border-color: var(--text); }
+  footer { color: var(--muted); font-size: 13px; padding: 32px 0 48px; }
+
+  /* Lightbox */
+  .lightbox {
+    position: fixed; inset: 0; z-index: 100;
+    background: var(--overlay);
+    display: none; align-items: center; justify-content: center;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img {
+    max-width: 92vw; max-height: 84vh; object-fit: contain;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+  }
+  .lightbox .caption {
+    position: absolute; bottom: 20px; left: 0; right: 0;
+    text-align: center; color: #cfcac2; font-size: 14px; padding: 0 60px;
+  }
+  .lb-btn {
+    position: absolute; background: none; border: none; color: #fff;
+    font-size: 32px; line-height: 1; cursor: pointer; padding: 16px;
+    opacity: 0.7;
+  }
+  .lb-btn:hover { opacity: 1; }
+  .lb-close { top: 8px; right: 12px; }
+  .lb-prev { left: 8px; top: 50%; transform: translateY(-50%); }
+  .lb-next { right: 8px; top: 50%; transform: translateY(-50%); }
+
+  @media (max-width: 720px) {
+    .wrap { padding: 0 16px; }
+    header .wrap { flex-direction: column; gap: 8px; padding-top: 14px; padding-bottom: 14px; }
+    nav { gap: 18px; }
+    .intro { padding: 44px 0 32px; }
+    .gallery { columns: 2 150px; column-gap: 8px; }
+    .gallery figure { margin-bottom: 8px; }
+    .about-grid { grid-template-columns: 1fr; gap: 28px; }
+    .lb-prev, .lb-next { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a class="name" href="#">Kai takes photos</a>
+    <nav>
+      <a href="#work">Work</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="intro" id="work">
+    <h1>Real ones pull guard</h1>
+    <p>Sports and events photography. Available for commissions and collaborations.</p>
+  </div>
+
+  <div class="filters" id="filters"></div>
+  <div class="gallery" id="gallery"></div>
+</main>
+
+<section class="block" id="about">
+  <div class="wrap about-grid">
+    <!-- Replace with a photo of yourself: images/me.jpg -->
+    <img src="images/ashwins_78um.jpg" alt="Portrait of Kai" loading="lazy">
+    <div>
+      <h2>About</h2>
+      <p>Hello! I am Kai and I have a super cool friend named Sabrina!</p>
+      <!-- <p>Mention any clients, publications, exhibitions, or awards — or what kind of work you're looking for.</p> -->
+    </div>
+  </div>
+</section>
+
+<section class="block" id="contact">
+  <div class="wrap">
+    <h2>Contact</h2>
+    <p>For bookings:</p>
+    <div class="contact-links">
+      <a href="mailto:kancheta9@gmail.com">kancheta9@gmail.com</a>
+      <a href="https://instagram.com/keoni819?rpxt=MXR0b2l3ODY5dWJueA%3D%3D" target="_blank" rel="noopener">Instagram</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">© <span id="year"></span> Kai. All photographs are the property of the photographer.</div>
+</footer>
+
+<div class="lightbox" id="lightbox" aria-hidden="true">
+  <button class="lb-btn lb-close" aria-label="Close">×</button>
+  <button class="lb-btn lb-prev" aria-label="Previous">‹</button>
+  <img id="lb-img" alt="">
+  <button class="lb-btn lb-next" aria-label="Next">›</button>
+  <div class="caption" id="lb-caption"></div>
+</div>
+
+<script>
+
+// Photos list, category automatic sorting
+const photos = [
+  { src: "images/001.png",  caption: "Bulbasaur. For some time after its birth, it uses the nutrients that are packed into the seed on its back in order to grow.",  
+                            category: "Pokémon" },
+  { src: "images/002.png",  caption: "Ivysaur. The more sunlight Ivysaur bathes in, the more strength wells up within it, allowing the bud on its back to grow larger.",         
+                            category: "Pokémon" },
+  { src: "images/003.png",  caption: "Venusaur. After a rainy day, the flower on its back smells stronger. The scent attracts other Pokémon.",           
+                            category: "Pokémon" }
+];
+
+const gallery = document.getElementById("gallery");
+const filters = document.getElementById("filters");
+let visible = photos.slice();
+
+function render(list) {
+  visible = list;
+  gallery.innerHTML = "";
+  list.forEach((p, i) => {
+    const fig = document.createElement("figure");
+    const img = document.createElement("img");
+    img.src = p.src;
+    img.alt = p.caption || "";
+    img.loading = "lazy";
+    img.onload = () => img.classList.add("loaded");
+    fig.appendChild(img);
+    fig.addEventListener("click", () => openLightbox(i));
+    gallery.appendChild(fig);
+  });
+}
+
+const categories = ["All", ...new Set(photos.map(p => p.category).filter(Boolean))];
+if (categories.length > 2) {
+  categories.forEach((c, i) => {
+    const b = document.createElement("button");
+    b.textContent = c;
+    if (i === 0) b.classList.add("active");
+    b.onclick = () => {
+      filters.querySelectorAll("button").forEach(x => x.classList.remove("active"));
+      b.classList.add("active");
+      render(c === "All" ? photos : photos.filter(p => p.category === c));
+    };
+    filters.appendChild(b);
+  });
+}
+
+/* Lightbox */
+const lb = document.getElementById("lightbox");
+const lbImg = document.getElementById("lb-img");
+const lbCap = document.getElementById("lb-caption");
+let current = 0;
+
+function show(i) {
+  current = (i + visible.length) % visible.length;
+  lbImg.src = visible[current].src;
+  lbImg.alt = visible[current].caption || "";
+  lbCap.textContent = visible[current].caption || "";
+}
+function openLightbox(i) { show(i); lb.classList.add("open"); lb.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden"; }
+function closeLightbox() { lb.classList.remove("open"); lb.setAttribute("aria-hidden", "true"); document.body.style.overflow = ""; }
+
+lb.querySelector(".lb-close").onclick = closeLightbox;
+lb.querySelector(".lb-prev").onclick = e => { e.stopPropagation(); show(current - 1); };
+lb.querySelector(".lb-next").onclick = e => { e.stopPropagation(); show(current + 1); };
+lb.addEventListener("click", e => { if (e.target === lb) closeLightbox(); });
+document.addEventListener("keydown", e => {
+  if (!lb.classList.contains("open")) return;
+  if (e.key === "Escape") closeLightbox();
+  if (e.key === "ArrowLeft") show(current - 1);
+  if (e.key === "ArrowRight") show(current + 1);
+});
+let touchX = null;
+lb.addEventListener("touchstart", e => { touchX = e.touches[0].clientX; }, { passive: true });
+lb.addEventListener("touchend", e => {
+  if (touchX === null) return;
+  const dx = e.changedTouches[0].clientX - touchX;
+  if (Math.abs(dx) > 50) show(current + (dx < 0 ? 1 : -1));
+  touchX = null;
+});
+
+document.getElementById("year").textContent = new Date().getFullYear();
+render(photos);
+</script>
+</body>
+</html>
