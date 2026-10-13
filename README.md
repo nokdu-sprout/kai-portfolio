@@ -1,1 +1,1 @@
-First commit I guess
+Deployed: https://nokdu-sprout.github.io/kai-portfolio/
