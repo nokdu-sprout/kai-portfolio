@@ -78,8 +78,8 @@
     margin-bottom: 48px; transition: background 0.2s, color 0.2s;
   }
   .work-toggle:hover { background: var(--text); color: var(--bg); }
-  .work-count { color: var(--muted); letter-spacing: 0.06em; }
-  .work-toggle:hover .work-count { color: inherit; opacity: 0.7; }
+  /* .work-count { color: var(--muted); letter-spacing: 0.06em; } */
+  /* .work-toggle:hover .work-count { color: inherit; opacity: 0.7; } */
   .work-arrow { display: inline-block; transition: transform 0.3s ease; }
   .work-toggle[aria-expanded="true"] .work-arrow { transform: rotate(180deg); }
   .work-panel { animation: fadeIn 0.4s ease; }
@@ -170,7 +170,7 @@
 
 <header>
   <div class="wrap">
-    <a class="name" href="#">Kai takes photos</a>
+    <a class="name" href="#">Keoni Media</a>
     <nav>
       <a href="#work">Work</a>
       <a href="#about">About</a>
@@ -188,7 +188,7 @@
   <!-- Button that shows / hides the photos. Edit the words in "work-label" if you like. -->
   <button class="work-toggle" id="work-toggle" aria-expanded="false" aria-controls="work-panel">
     <span id="work-label">View my work</span>
-    <span class="work-count" id="work-count"></span>
+    <!-- <span class="work-count" id="work-count"></span> -->
     <span class="work-arrow" aria-hidden="true">↓</span>
   </button>
 
@@ -355,7 +355,7 @@ photos = loadPhotos();
 if (photos.length) {
   buildFilters();
   render(photos);
-  document.getElementById("work-count").textContent = `(${photos.length})`;
+  // document.getElementById("work-count").textContent = `(${photos.length})`;
 } else if (!gallery.innerHTML) {
   gallery.innerHTML = `<p style="color:var(--muted)">No photos found yet. Check the folder names in FOLDERS.</p>`;
 }
