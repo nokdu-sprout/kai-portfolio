@@ -1,9 +1,12 @@
+---
+<!-- intentionally left blank for github pages -->
+---
 <!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kai takes photos</title>
+<title>Kai's portfolio</title>
 <meta name="description" content="Photography portfolio for Kai">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -162,7 +165,7 @@
 
 <main class="wrap">
   <div class="intro" id="work">
-    <h1>Real ones pull guard</h1>
+    <h1>Kai's Photography Portfolio</h1>
     <p>Sports and events photography. Available for commissions and collaborations.</p>
   </div>
 
@@ -172,12 +175,11 @@
 
 <section class="block" id="about">
   <div class="wrap about-grid">
-    <!-- Replace with a photo of yourself: images/me.jpg -->
+    <!-- Self portrait -->
     <img src="images/ashwins_78um.jpg" alt="Portrait of Kai" loading="lazy">
     <div>
       <h2>About</h2>
       <p>Hello! I am Kai and I have a super cool friend named Sabrina!</p>
-      <!-- <p>Mention any clients, publications, exhibitions, or awards — or what kind of work you're looking for.</p> -->
     </div>
   </div>
 </section>
@@ -205,21 +207,55 @@
   <div class="caption" id="lb-caption"></div>
 </div>
 
+<!-- GitHub Pages fills this in with every file in "images" folder. Github magic -->
+<script type="application/json" id="all-images">
+{% assign image_files = site.static_files | where_exp: "f", "f.path contains '/images/'" %}{{ image_files | map: "path" | jsonify }}
+</script>
+
 <script>
 
-// Photos list, category automatic sorting
-const photos = [
-  { src: "images/001.png",  caption: "Bulbasaur. For some time after its birth, it uses the nutrients that are packed into the seed on its back in order to grow.",  
-                            category: "Pokémon" },
-  { src: "images/002.png",  caption: "Ivysaur. The more sunlight Ivysaur bathes in, the more strength wells up within it, allowing the bud on its back to grow larger.",         
-                            category: "Pokémon" },
-  { src: "images/003.png",  caption: "Venusaur. After a rainy day, the flower on its back smells stronger. The scent attracts other Pokémon.",           
-                            category: "Pokémon" }
+// Editable portion
+const FOLDERS = [
+  { folder: "images/portraits", label: "Portraits" },
+  { folder: "images/mma-bjj",   label: "MMA / BJJ" },
 ];
 
+// optional captions, left blank otherwise
+const CAPTIONS = {
+  // "IMG_1234.jpg": "something super cool here",
+  // "sabrinaIsAwesome.jpg": "Sabrina is super awesome",
+};
+
+// Don't touch this stuff
 const gallery = document.getElementById("gallery");
 const filters = document.getElementById("filters");
-let visible = photos.slice();
+let photos = [];
+let visible = [];
+
+const IMAGE_TYPES = /\.(jpe?g|png|gif|webp|avif)$/i;
+
+// helper function for github magic
+function loadPhotos() {
+  let files;
+  try {
+    files = JSON.parse(document.getElementById("all-images").textContent);
+  } catch (e) {
+    gallery.innerHTML = `<p style="color:var(--muted)">Photos appear once the site is on GitHub Pages. (Opening this file on your computer can't read folders.)</p>`;
+    return [];
+  }
+  const list = [];
+  FOLDERS.forEach(f => {
+    const prefix = "/" + f.folder.replace(/^\/|\/$/g, "") + "/";
+    files
+      .filter(path => path.startsWith(prefix) && IMAGE_TYPES.test(path))
+      .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+      .forEach(path => {
+        const name = path.split("/").pop();
+        list.push({ src: path.slice(1), caption: CAPTIONS[name] || "", category: f.label });
+      });
+  });
+  return list;
+}
 
 function render(list) {
   visible = list;
@@ -237,8 +273,10 @@ function render(list) {
   });
 }
 
-const categories = ["All", ...new Set(photos.map(p => p.category).filter(Boolean))];
-if (categories.length > 2) {
+function buildFilters() {
+  filters.innerHTML = "";
+  const categories = ["All", ...new Set(photos.map(p => p.category).filter(Boolean))];
+  if (categories.length <= 2) return;
   categories.forEach((c, i) => {
     const b = document.createElement("button");
     b.textContent = c;
@@ -287,7 +325,14 @@ lb.addEventListener("touchend", e => {
 });
 
 document.getElementById("year").textContent = new Date().getFullYear();
-render(photos);
+
+photos = loadPhotos();
+if (photos.length) {
+  buildFilters();
+  render(photos);
+} else if (!gallery.innerHTML) {
+  gallery.innerHTML = `<p style="color:var(--muted)">No photos found yet. Check the folder names in PHOTO FOLDERS.</p>`;
+}
 </script>
 </body>
 </html>
