@@ -1,7 +1,7 @@
 ---
 ---
-<!-- intentionally left blank for github pages -->
 <!doctype html>
+<!-- intentionally left blank for github pages -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -68,6 +68,22 @@
     margin-bottom: 16px;
   }
   .intro p { color: var(--muted); font-size: 17px; }
+
+  /* Show / hide work button */
+  .work-toggle {
+    display: inline-flex; align-items: center; gap: 12px;
+    font: inherit; font-size: 14px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--text); background: none;
+    border: 1px solid var(--text); padding: 14px 26px; cursor: pointer;
+    margin-bottom: 48px; transition: background 0.2s, color 0.2s;
+  }
+  .work-toggle:hover { background: var(--text); color: var(--bg); }
+  .work-count { color: var(--muted); letter-spacing: 0.06em; }
+  .work-toggle:hover .work-count { color: inherit; opacity: 0.7; }
+  .work-arrow { display: inline-block; transition: transform 0.3s ease; }
+  .work-toggle[aria-expanded="true"] .work-arrow { transform: rotate(180deg); }
+  .work-panel { animation: fadeIn 0.4s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
   /* Filters */
   .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
@@ -169,14 +185,23 @@
     <p>Sports and events photography. Available for commissions and collaborations.</p>
   </div>
 
-  <div class="filters" id="filters"></div>
-  <div class="gallery" id="gallery"></div>
+  <!-- Button that shows / hides the photos. Edit the words in "work-label" if you like. -->
+  <button class="work-toggle" id="work-toggle" aria-expanded="false" aria-controls="work-panel">
+    <span id="work-label">View my work</span>
+    <span class="work-count" id="work-count"></span>
+    <span class="work-arrow" aria-hidden="true">↓</span>
+  </button>
+
+  <div class="work-panel" id="work-panel" hidden>
+    <div class="filters" id="filters"></div>
+    <div class="gallery" id="gallery"></div>
+  </div>
 </main>
 
 <section class="block" id="about">
   <div class="wrap about-grid">
     <!-- Self portrait -->
-    <img src="images/ashwins_78um.jpg" alt="Portrait of Kai" loading="lazy">
+    <img src="images/self.JPEG" alt="Portrait of Kai" loading="lazy">
     <div>
       <h2>About</h2>
       <p>Hello! I am Kai and I have a super cool friend named Sabrina!</p>
@@ -330,9 +355,24 @@ photos = loadPhotos();
 if (photos.length) {
   buildFilters();
   render(photos);
+  document.getElementById("work-count").textContent = `(${photos.length})`;
 } else if (!gallery.innerHTML) {
-  gallery.innerHTML = `<p style="color:var(--muted)">No photos found yet. Check the folder names in PHOTO FOLDERS.</p>`;
+  gallery.innerHTML = `<p style="color:var(--muted)">No photos found yet. Check the folder names in FOLDERS.</p>`;
 }
+
+/* Show / hide the work section */
+const workToggle = document.getElementById("work-toggle");
+const workPanel = document.getElementById("work-panel");
+const workLabel = document.getElementById("work-label");
+const OPEN_TEXT = workLabel.textContent;
+function setWorkOpen(open) {
+  workPanel.hidden = !open;
+  workToggle.setAttribute("aria-expanded", open);
+  workLabel.textContent = open ? "Hide my work" : OPEN_TEXT;
+}
+workToggle.onclick = () => setWorkOpen(workPanel.hidden);
+// The "Work" link in the menu opens the section too
+document.querySelector('nav a[href="#work"]').addEventListener("click", () => setWorkOpen(true));
 </script>
 </body>
 </html>
